@@ -4,7 +4,6 @@ _My midterm project for the "Decentralized Applications" course by Siraj Raval._
 ## Description
 
 Based on the pig dice game, Sausage Roll is a 2 player game that pits you against players online where you can compete to win each others ethers. *online element yet to be implemented*
-#### By **Tak-John Cheung**
 
 * Each player deposits 0.01 ether to play the game, the ethers collected forms the prize pool. *Currently uses the first two generated addresses from ganache to play the game*
 * If the player rolls a "one", they score nothing and it becomes the next player's turn.
