@@ -15,8 +15,8 @@ Based on the pig dice game, Sausage Roll is a 2 player game that pits you agains
 
 ### Prerequisites
 ```
-- Install [Node.js](https://nodejs.org/en/download/)
-- Install [ganache](http://truffleframework.com/ganache/)
+Install [Node.js](https://nodejs.org/en/download/)
+Install [ganache](http://truffleframework.com/ganache/)
 ```
 Issues with multiple events not registering with the browser when using ganache-cli on windows but seems to work fine on mac
 
