@@ -275,7 +275,7 @@ button:focus {
 }
 
 .rules-content {
-    background-image: linear-gradient(rgba(255, 255, 0, 0.1), rgba(255, 50, 0, 0.3)), url("cross-hatch-light.png");
+    background-image: linear-gradient(rgba(255, 255, 0, 0.1), rgba(255, 50, 0, 0.3)), url("../images/cross-hatch-light.png");
     background-repeat: repeat;
     font-size: 22px;
     letter-spacing: 0.5px;
