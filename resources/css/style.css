@@ -1,0 +1,332 @@
+/* general */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+body {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1)), url("../images/pigs-crowd.png");
+    background-repeat: repeat;
+    font-family: 'Bangers', Arial, Helvetica, sans-serif;
+    position: relative;
+    height: 100vh;
+}
+
+
+/* hatch background for inactive player */
+.wrapper {
+    background-image: linear-gradient(rgba(255, 255, 0, 0.1), rgba(255, 50, 0, 0.2)), url("../images/cross-hatch-dark.png");
+    background-repeat: repeat;
+    background-color: #fccc58;
+    box-shadow: 0px 10px 50px rgba(0, 0, 0, 0.35);
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    top: 50%;
+    left: 50%;
+    border: 3px solid black;
+}
+
+
+/* player panels */
+.player-0-panel, .player-1-panel {
+    float: left;
+    width: 50%;
+    height: 620px;
+    padding: 100px;
+    border: 2px solid black;
+}
+
+.player-name {
+    font-size: 40px;
+    text-align: center;
+    position: relative;
+    margin-top: 50px;
+    margin-bottom: 23px;
+}
+
+.player-score {
+    font-size: 80px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #432;
+}
+
+.player-current-box {
+    text-align: center;
+    width: 100%;
+    margin: 0 auto;
+    color: #9ab6b8;
+}
+
+.player-current-score, .player-current-label {
+    visibility: hidden;
+}
+
+
+/* active panel */
+.active { 
+    background-color: #fff;
+}
+
+.active .player-name { 
+    color: #ff6600;
+}
+
+.active .player-score {
+    color: #000;
+}
+
+.active .player-name::after {
+    font-family:  Arial, Helvetica, sans-serif;
+    font-size: 50px;
+    content: "\2022";
+    position: absolute;
+    top: -20px;
+    right: 10px;
+    color: #fbb306;
+}
+
+.active .player-current-label { 
+    font-size: 28px;
+    margin-bottom: 15px;
+    color: #fbb306;
+    visibility: visible;
+}
+
+.active .player-current-score {
+    font-size: 50px;
+    visibility: visible;
+}
+
+
+/* winner panel */
+.winner {
+    background-color: #fff;
+    letter-spacing: 2px;
+    color: #000;
+}
+.winner .player-score { 
+    color: #000;
+}
+
+/* hatch background for inactive player */
+.wrapper {
+    background-image: linear-gradient(rgba(255, 255, 0, 0.1), rgba(255, 50, 0, 0.2)), url("../images/cross-hatch-dark.png");
+    background-repeat: repeat;
+    background-color: #fccc58;
+    box-shadow: 0px 10px 50px rgba(0, 0, 0, 0.35);
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    top: 50%;
+    left: 50%;
+    border: 3px solid black;
+}
+
+/* buttons */
+button {
+    background: #d0702f;
+    font-family: 'Bangers', Arial, Helvetica, sans-serif;
+    font-size: 30px;
+    box-shadow: 0px -4px 4px #923b00 inset;
+    transition: background-color 0.3s, color 0.3s;
+    cursor: pointer;
+    position: absolute;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 50px;
+    left: 100%;
+    color: #000000;
+    border: 3px solid black;
+    border-radius: 500px;
+}
+
+button:hover {
+    background: #fbb306;
+    box-shadow: 0px -4px 4px #d0702f inset;
+    color: #fff;
+}
+
+button:focus {
+    outline: none;
+}
+
+.btn-new { 
+    font-size: 18px;
+    width: 100px;
+    height: 40px;
+    display: none; 
+}
+
+.btn-rules { 
+    font-size: 18px;
+    width: 100px;
+    height: 40px;
+}
+
+.btn-new {
+    top: 48px;
+    left: 50%;
+}
+
+.btn-rules {
+    top: 100px;
+    left: 50%;
+
+}
+
+.btn-roll { 
+    top: 405px;
+    left: 50%;
+    visibility: visible;
+}
+
+.btn-hodl { 
+    top: 470px;
+    left: 50%;
+    visibility: visible;
+}
+
+.btn-join-0 {
+    top: 470px;
+    left: 25%;
+    visibility: hidden;
+}
+
+.btn-join-0 span#join-0-a {
+  display: inline;
+}
+
+.btn-join-0:hover span#join-0-a {
+  display: none;
+}
+
+.btn-join-0 span#join-0-b {
+  display: none;
+}
+
+.btn-join-0:hover span#join-0-b {
+  display: inline;
+}
+
+.btn-join-1 {
+    position: absolute;
+    visibility: hidden;
+    top: 470px;
+    left: 75%;
+}
+
+.btn-join-1 span#join-1-a {
+  display: inline;
+}
+
+.btn-join-1:hover span#join-1-a {
+  display: none;
+}
+
+.btn-join-1 span#join-1-b {
+  display: none;
+}
+
+.btn-join-1:hover span#join-1-b {
+  display: inline;
+}
+
+
+/* dice */
+.dice {
+    position: absolute;
+    left: 50%;
+    top: 185px;
+    transform: translateX(-50%);
+    height: 175px;
+}
+
+#loader {
+    position: absolute;
+    left: 50%;
+    top: 208px;
+    transform: translateX(-50%);
+    width: 130px;
+    display: none;
+    filter: sepia(30%);
+}
+
+
+/* rules window */
+.rules {
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding-top: 80px;
+    overflow: auto;
+    display: none;
+}
+
+.rules-content {
+    background-image: linear-gradient(rgba(255, 255, 0, 0.1), rgba(255, 50, 0, 0.3)), url("cross-hatch-light.png");
+    background-repeat: repeat;
+    font-size: 22px;
+    letter-spacing: 0.5px;
+    line-height: 35px;
+    word-spacing: 5px;
+    width: 650px;
+    margin: auto;
+    padding: 50px;
+    color: #000;
+    border: 4px solid #000;
+}
+
+.close {
+    font-size: 42px;
+    float: right;
+    position: relative;
+    top: -35px;
+    right: -25px;
+    color: #000;
+}
+
+.close:hover, .close:focus {
+    text-decoration: none;
+    cursor: pointer;
+    color: #fff;
+}
+
+h1 {
+    font-weight: normal;
+    padding-bottom: 18px;
+}
+
+ul {
+    width: 500px;
+    padding-top: 15px;
+    padding-left: 20px;
+    padding-bottom: 15px;
+}
+
+em {
+    font-weight: normal;
+    color: #ff2000;
+}
+
+a:link, a:visited {
+  text-decoration:  none;
+  color:            #ff2200;
+} 
+
+a:hover, a:active {
+  text-decoration:  none;
+  color:            #fff;
+}
+

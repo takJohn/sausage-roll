@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>      
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sausage Roll</title>
+
+        <link href="https://fonts.googleapis.com/css?family=Bangers" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="resources/css/style.css">
+        <link rel="shortcut icon" href="resources/images/favicon.ico" type="image/x-icon" />
+
+        <script src="./node_modules/web3/dist/web3.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>        
+        
+        <title>Sausage Roll</title>
+    </head>
+
+    <body>
+        <div class="wrapper clearfix">
+            <div class="player-0-panel active">
+                <div class="player-name" id="name-0">Player 1</div>
+                <div class="player-score" id="score-0">0</div>
+                <div class="player-current-box">
+                    <div class="player-current-label">Current</div>
+                    <div class="player-current-score" id="current-0"></div>
+                </div>
+            </div>
+            
+            <div class="player-1-panel">
+                <div class="player-name" id="name-1">Player 2</div>
+                <div class="player-score" id="score-1">0</div>
+                <div class="player-current-box">
+                    <div class="player-current-label">Current</div>
+                    <div class="player-current-score" id="current-1">0</div>
+                </div>
+            </div>
+            
+            <button class="btn-new">New game</button>
+            <button class="btn-rules">Rules</button>
+            <button class="btn-roll">Roll</button>
+            <button class="btn-hodl">Hodl</button>
+            <button class="btn-join-0"><span id="join-0-a">Join</span><span id="join-0-b">0.01 Eth</span></button>
+            <button class="btn-join-1"><span id="join-1-a">Join</span><span id="join-1-b">0.01 Eth</span></button>
+            
+            <img src="resources/images/dice-5.png" alt="Dice" class="dice">
+            <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
+        </div>
+        
+        <!-- The Modal -->
+        <div id="rules-modal" class="rules">
+
+          <!-- Modal content -->
+          <div class="rules-content">
+            <span class="close">&times;</span>
+            <h1>Sausage Roll</h1>
+            <p>Based on the pig dice game, Sausage Roll is a 2 player game that pits you against players online where you can compete to win each others ethers:</p>
+                <ul>
+                    <li>Each player deposits 0.01 ether to play the game, the ethers collected forms the prize pool.</li> 
+                    <li>If the player rolls a "one", they score nothing and it becomes the next player's turn.</li> 
+                    <li>If the player rolls any other number, it is added to their turn total and the player's turn continues.</li>
+                    <li>If a player chooses to "hodl", their turn total is added to their score, and it becomes the next player's turn.</li>
+                    <li>The first player to score "one hundred" or more points wins the game and the ethers in the prize pool minus a small pecentage that gets added to the monthly prize.</li>
+                    <li>The player can continue rolling after they've scored over "one hundred" - this will allow them to earn a higher score and a chance to win the monthly "highest score" prize.</li>
+                    <li><em>Warning: </em>going for the highest score will put the player at a greater risk of losing the game.</li>
+                    <li>If you lose - you'll be forced to eat a sausage roll made from one of the randomly selected pigs in the background.</li>
+                    <li>That pig was probably cheering for you to win in the crowd but it died.</li>
+                    <li>because of you...</li>
+                    <li>You're still reading this? OK - see below.</li> 
+                </ul>
+            <p>For example, the first player, Satoshi, begins a turn with a roll of "five". Satoshi could "hodl" and score "five" points, but chooses to roll again. Satoshi rolls a "two", and could "hodl" with a turn total of "seven" points, but chooses to roll again. Satoshi rolls a "one", and must end his/her/their turn without scoring. The next player, Vitalik, rolls the sequence "four-five-three-five-five", after which he chooses to "hodl", and adds his turn total of "twenty two" points to his score. See <a href="https://en.wikipedia.org/wiki/Pig_(dice_game)">wikipedia</a> for more information...</p>
+          </div>
+
+        </div>
+        <script>
+
+            var web3Host = "http://127.0.0.1:7545";
+
+            // Is there an injected web3 instance?
+            if (typeof web3 !== 'undefined') {
+                web3 = new Web3(web.currentProvider);
+            } else {
+                web3 = new Web3(new Web3.providers.HttpProvider(web3Host)); 
+            }
+            var SausageRollBytecode = "608060405260008060016101000a81548161ffff021916908361ffff1602179055506064600060036101000a81548161ffff021916908361ffff16021790555034801561004b57600080fd5b50610cc18061005b6000396000f30060806040526004361061008e576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680632052948714610093578063546216f1146100c657806360f14509146100f95780637fdffd231461011057806384eda66214610167578063c19d93fb146101c6578063cd5e3c5d146101ff578063d4f77b1c14610216575b600080fd5b34801561009f57600080fd5b506100a8610220565b604051808261ffff1661ffff16815260200191505060405180910390f35b3480156100d257600080fd5b506100db610234565b604051808261ffff1661ffff16815260200191505060405180910390f35b34801561010557600080fd5b5061010e610248565b005b34801561011c57600080fd5b5061012561065d565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34801561017357600080fd5b506101a8600480360381019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610683565b604051808261ffff1661ffff16815260200191505060405180910390f35b3480156101d257600080fd5b506101db6106a4565b604051808260028111156101eb57fe5b60ff16815260200191505060405180910390f35b34801561020b57600080fd5b506102146106b6565b005b61021e6108c7565b005b600060059054906101000a900461ffff1681565b600060039054906101000a900461ffff1681565b3373ffffffffffffffffffffffffffffffffffffffff16600060079054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff161415156102a157fe5b60018060028111156102af57fe5b6000809054906101000a900460ff1660028111156102c957fe5b1415156102d257fe5b600060059054906101000a900461ffff16600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008282829054906101000a900461ffff160192506101000a81548161ffff021916908361ffff160217905550600060039054906101000a900461ffff1661ffff16600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060009054906101000a900461ffff1661ffff16101515610559573373ffffffffffffffffffffffffffffffffffffffff166108fc3073ffffffffffffffffffffffffffffffffffffffff16319081150290604051600060405180830381858888f1935050505015801561041a573d6000803e3d6000fd5b5060026000806101000a81548160ff0219169083600281111561043957fe5b021790555060008060056101000a81548161ffff021916908361ffff1602179055507f213770f43c1fad46fa4838d398128d50b578d8628c1a4659e6b45a2c0415613b33600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060009054906101000a900461ffff1660405180806020018473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018361ffff1661ffff168152602001828103825260078152602001807f57696e6e65722100000000000000000000000000000000000000000000000000815250602001935050505060405180910390a161057f565b60008060056101000a81548161ffff021916908361ffff16021790555061057e610a88565b5b7f7bfff4204ed5513465bd1bff52f494f57418f707fe2e3752c3e7fb83447d4387600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060009054906101000a900461ffff16604051808261ffff1661ffff16815260200191505060405180910390a17f2c10375e2823a6ff01daa2ff16d3e5cd3b62f15f3d3a6b78b187597c02e6b41d600060059054906101000a900461ffff16604051808261ffff1661ffff16815260200191505060405180910390a150565b600060079054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60026020528060005260406000206000915054906101000a900461ffff1681565b6000809054906101000a900460ff1681565b60003373ffffffffffffffffffffffffffffffffffffffff16600060079054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1614151561071157fe5b600180600281111561071f57fe5b6000809054906101000a900460ff16600281111561073957fe5b14151561074257fe5b600160066001430340600060019054906101000a900461ffff166040518083600019166000191681526020018261ffff1661ffff167e010000000000000000000000000000000000000000000000000000000000000281526002019250505060405180910390206001900461ffff168115156107ba57fe5b060191506000600181819054906101000a900461ffff168092919060010191906101000a81548161ffff021916908361ffff160217905550507fcfc5db1435ac8b3e4be57d747ec352c7b5015db4fb90ddaf321b39eb48bacc3482604051808261ffff1661ffff16815260200191505060405180910390a160018261ffff1614151561084e5761084982610c13565b6108c3565b610856610a88565b60008060056101000a81548161ffff021916908361ffff1602179055507f2c10375e2823a6ff01daa2ff16d3e5cd3b62f15f3d3a6b78b187597c02e6b41d600060059054906101000a900461ffff16604051808261ffff1661ffff16815260200191505060405180910390a15b5050565b60008060028111156108d557fe5b6000809054906101000a900460ff1660028111156108ef57fe5b1415156108f857fe5b662386f26fc100003414151561090a57fe5b60013390806001815401808255809150509060018203906000526020600020016000909192909190916101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505060026001805490501415610a855760016000806101000a81548160ff0219169083600281111561099c57fe5b0217905550600160008154811015156109b157fe5b9060005260206000200160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16600060076101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507f9e0b680a09b6aae9e87d9aba60f6d6d946300f35f4c6278e75855aea40d11bb16040518080602001828103825260128152602001807f4c657473205361757361676520526f6c6c21000000000000000000000000000081525060200191505060405180910390a15b50565b60016000815481101515610a9857fe5b9060005260206000200160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16600060079054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1614610b965760016000815481101515610b2757fe5b9060005260206000200160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16600060076101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055610c10565b600180815481101515610ba557fe5b9060005260206000200160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16600060076101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555b50565b80600060058282829054906101000a900461ffff160192506101000a81548161ffff021916908361ffff1602179055507f2c10375e2823a6ff01daa2ff16d3e5cd3b62f15f3d3a6b78b187597c02e6b41d600060059054906101000a900461ffff16604051808261ffff1661ffff16815260200191505060405180910390a1505600a165627a7a72305820b303e64e9f17277e43f9d620b45c1c1810b7814091581b7ede4817acf5c985010029"
+            var SausageRollABI =
+[
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "currentScore",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint16"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "winningScore",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint16"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [],
+        "name": "hodl",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "activePlayer",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "totalScore",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint16"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "state",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [],
+        "name": "roll",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [],
+        "name": "joinGame",
+        "outputs": [],
+        "payable": true,
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "message",
+                "type": "string"
+            }
+        ],
+        "name": "GameStart",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "message",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "name": "winner",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "winScore",
+                "type": "uint16"
+            }
+        ],
+        "name": "GameEnd",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "rolledScore",
+                "type": "uint16"
+            }
+        ],
+        "name": "DiceScore",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "currentScore",
+                "type": "uint16"
+            }
+        ],
+        "name": "CurrentScore",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "totalScore",
+                "type": "uint16"
+            }
+        ],
+        "name": "HodlScore",
+        "type": "event"
+    }
+];
+            // Create new contract
+            var SausageRollContract, SausageRoll, deployedContract, receipt;
+
+            SausageRollContract = web3.eth.contract(SausageRollABI);
+            deployedContract = SausageRollContract.new({data: SausageRollBytecode, from: web3.eth.accounts[9], gas: 3000000});  // Account 9 used to create contract
+            receipt = web3.eth.getTransactionReceipt(deployedContract.transactionHash);
+            SausageRoll = SausageRollContract.at(receipt.contractAddress);
+            console.log("contract address: " + receipt.contractAddress);
+
+            // Player 1 joins the game with 0.01 eth
+            SausageRoll.joinGame({from: web3.eth.accounts[0], gas: 3000000, value: 10000000000000000},  function(error, result) {
+                if(!error) {
+                    console.log("player 1 enters the game...")
+                } else {
+                    console.log(error);
+                }
+            });
+
+            // Player 2 joins the game with 0.01 eth
+            web3.eth.defaultAccount = web3.eth.accounts[1];
+            SausageRoll.joinGame({from: web3.eth.accounts[1], gas: 3000000, value: 10000000000000000}, function(error, result) {
+                if(!error) {
+                    console.log("player 2 enters the game...")
+                } else {
+                    console.log(error);
+                }
+            });
+
+            var firstToRoll;
+
+            SausageRoll.activePlayer.call(function(error, result){
+                if(!error) {
+                    firstToRoll = result.toString();
+                } else {
+                    console.log(error);
+                }
+                
+            });
+
+            web3.eth.defaultAccount = firstToRoll; // Sets default account to player to first join
+            
+            // Events and variables
+            var gameStartEvent = SausageRoll.GameStart();
+            var gameEndEvent = SausageRoll.GameEnd();
+            var diceScoreEvent = SausageRoll.DiceScore();
+            var currentScoreEvent = SausageRoll.CurrentScore();
+            var hodlScoreEvent = SausageRoll.HodlScore();
+            var audio = new Audio('resources/audios/roll.wav');
+            var winningScore;
+            var state;  // Game state: 0 = waiting, 1 = started, 2 = finished
+
+            // Keeps the page in sync
+            SausageRoll.activePlayer.call(function(error, result){
+
+                if (result.toString() == web3.eth.accounts[0]) {
+                    activePlayer = 0;
+                    web3.eth.defaultAccount = web3.eth.accounts[0];
+                    document.querySelector('.player-0-panel').classList.add('active');
+                    document.querySelector('.player-1-panel').classList.remove('active');
+                } else {
+                    activePlayer = 1;
+                    web3.eth.defaultAccount = web3.eth.accounts[1];
+                    document.querySelector('.player-0-panel').classList.remove('active');
+                    document.querySelector('.player-1-panel').classList.add('active');
+                }
+            });
+
+            SausageRoll.totalScore.call(web3.eth.accounts[0], function(error, result){
+                $("#score-0").html(result.toString());
+            });
+
+            SausageRoll.totalScore.call(web3.eth.accounts[1], function(error, result){
+                $("#score-1").html(result.toString());
+            });
+
+            SausageRoll.currentScore.call(function(error, result){
+                $("#current-" + activePlayer).html(result.toString());
+            });
+
+            SausageRoll.winningScore.call(function(error, result){
+                winningScore = result.c[0];
+            });     
+        
+            function getState() {
+                SausageRoll.state.call(function(error, result){
+                    if (!error) {
+
+                        state = result.c[0];
+
+                        if (state == 2) {
+                            winningCondition();
+                        }
+
+                    } else {
+                        console.log(error);
+                    }
+
+                });
+            }
+    
+            getState();
+
+            // Button interactions
+            $(".btn-roll").click(function() {
+
+                getState();
+
+                if (state !== 2) {
+                    audio.play();
+                    console.log("current player: " + web3.eth.defaultAccount);
+                    $("#loader").show();
+                    SausageRoll.roll();
+                } else {
+                    alert("Game has ended. Refresh page to play again.");
+                }
+            });
+
+            $(".btn-hodl").click(function() {
+
+                if (state !== 2) {
+                    SausageRoll.hodl();
+                    console.log("player " + activePlayer + " hodls");
+
+                    getState();
+                } else {
+                    alert("Game has ended. Refresh page to play again.");
+                }
+
+            });            
+
+            $(".btn-new").click(function() {
+                // Needs work
+            });
+
+            // Dice score event
+            diceScoreEvent.watch(function(error, result) {
+                if(!error) {
+
+                    $("#loader").hide();
+
+                    // Get the rolled dice score
+                    var dice = result.args.rolledScore.c[0];
+                    console.log("player rolled a " + dice);
+
+                    // Display dice image based on dice score
+                    var diceDOM = document.querySelector('.dice') 
+                    diceDOM.style.display = 'block';
+
+
+                    // Uncommend out the statement below if IPFS isn't working and comment out the switch statement
+                    /*
+                    diceDOM.src = 'resources/images/dice-' + dice + '.png';
+
+                    if (dice == 1) {
+                        switchPlayer();
+                    }
+
+                    */ 
+                    
+                    // Uses IPFS to display the dice based on the number rolled (comment out if IPFS isn't working)
+                    switch(dice) {
+                        case 1:
+                            diceDOM.src = 'https://gateway.ipfs.io/ipfs/QmU43Ui1DQWNoVbLb4MPg3aYHkmNBGSAeag9g7yiEnRndc';
+                            switchPlayer();
+                            break;
+                        case 2:
+                            diceDOM.src = 'https://gateway.ipfs.io/ipfs/QmXSn6dK29PswS1BXVYjWHZ7GxRsE8dFYtLqoV6GeHnTzL';
+                            break;                        
+                        case 3:
+                            diceDOM.src = 'https://gateway.ipfs.io/ipfs/QmXBEcHsnh26c5Fm5mJgMzfUJ5vfWkQCJrc9CuVpGNqSqT';
+                            break;                        
+                        case 4:
+                            diceDOM.src = 'https://gateway.ipfs.io/ipfs/QmZUtSpdoRgD24mTyazF31LEXJ2wU3gXB6wUDURq4FAvv4';
+                            break;                        
+                        case 5:
+                            diceDOM.src = 'https://gateway.ipfs.io/ipfs/Qmf8Rz3jBWS4kmY59CMnyBEmuRCNxk3hCUMDEbpoZAofYQ';
+                            break;                        
+                        case 6:
+                            diceDOM.src = 'https://gateway.ipfs.io/ipfs/QmaKe5tQR5iQ9UWfGvxEZX6Lsdm1VvKv2WdJ5iTWqnoucc';
+                            break;
+                        default:
+                            break;
+                    }
+                    
+
+                } else {
+
+                    $("#loader").hide();
+                    console.log(error);
+                }
+            });
+
+            // Hodl score
+            hodlScoreEvent.watch(function(error, result) {
+                if(!error) {
+                    
+                    $("#score-" + activePlayer).html(result.args.totalScore.toString());
+                    console.log("score: " + result.args.totalScore);
+
+                    // Switch active player after scores have been updated
+                    if (result.args.totalScore < winningScore) {
+                        switchPlayer();
+                    } 
+
+                } else {
+                    console.log(error);
+                }
+            });    
+
+            // Current score event
+            currentScoreEvent.watch(function(error, result) {
+                if(!error) {
+                    $("#current-" + activePlayer).html(result.args.currentScore.toString());
+                } else {
+                    console.log(error);
+                }
+            });   
+
+            // Game End Event
+            gameEndEvent.watch(function(error, result) {
+                if(!error) {
+                    winningCondition();
+                } else {
+                    console.log(error);
+                }
+            });
+            
+            // Switches to next player
+            function switchPlayer() {
+
+                activePlayer == 0 ? activePlayer = 1 : activePlayer = 0;
+                web3.eth.defaultAccount == web3.eth.accounts[0] ? web3.eth.defaultAccount = web3.eth.accounts[1] : web3.eth.defaultAccount = web3.eth.accounts[0];
+                console.log("switch player to: " + web3.eth.defaultAccount);
+                document.getElementById('current-0').textContent = '0';
+                document.getElementById('current-1').textContent = '0';
+                document.querySelector('.player-0-panel').classList.toggle('active');
+                document.querySelector('.player-1-panel').classList.toggle('active');  
+
+            }
+
+            // Winning page
+            function winningCondition() {
+                document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
+                document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
+                document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
+                document.querySelector('.dice').style.display = 'none';
+            } 
+            
+            // Rules window
+            var modal = document.getElementById('rules-modal');
+            var btn = document.querySelector(".btn-rules");
+            var span = document.getElementsByClassName("close")[0];
+
+            btn.onclick = function() {
+                modal.style.display = "block";
+            }
+
+            // When the user clicks on (x)
+            span.onclick = function() {
+                modal.style.display = "none";
+            }
+
+            // When the user clicks anywhere outside of the rules window
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }     
+
+        </script>
+    </body>
+</html>
