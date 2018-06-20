@@ -23,13 +23,13 @@ contract SausageRoll {
     
     // Checks what state the game is in
     modifier inState(State _state) {
-        assert(state == _state);
+        require(state == _state);
         _; 
     }
     
     // Checks if the player is the active player
     modifier isActive {
-        assert(activePlayer == msg.sender);
+        require(activePlayer == msg.sender);
         _;
     }
  
@@ -37,7 +37,7 @@ contract SausageRoll {
     function joinGame() public payable inState(State.Waiting) {
         
         // Requires a deposit of 0.01 ether to enter the game
-        assert(msg.value == 0.01 ether);
+        require(msg.value == 0.01 ether);
         players.push(msg.sender);
         
         // The game can start when 2 players have joined the game
