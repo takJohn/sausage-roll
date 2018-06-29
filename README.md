@@ -23,7 +23,7 @@ Issues with multiple events not registering with the browser when using ganache-
 ### To start playing
 ```
 - Clone this repository
-$ npm install ethereum/web3.js --save
+$ npm install
 - Open ganache with the default rpc server address > http://127.0.0.1:7545
 - If you're using a different address then remember to change the variable *web3Host* inside index.html
 - Open index.html in a web browser. A smart contract will be automactically generated
