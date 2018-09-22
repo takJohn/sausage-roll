@@ -1,7 +1,7 @@
 # Sausage Roll
 _My midterm project for the "Decentralized Applications" course by Siraj Raval._
 
-![screenshot](https://github.com/takJohn/decentralized-auction/blob/master/sausage-roll.png)
+![screenshot](https://github.com/takJohn/sausage-roll/blob/master/sausage-roll.png)
 
 ## Description
 
