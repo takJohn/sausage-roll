@@ -1,5 +1,5 @@
 # Sausage Roll
-_A screenshot of the dapp.
+_A screenshot of the dapp._
 
 ![screenshot](https://github.com/takJohn/sausage-roll/blob/master/sausage-roll.png)
 
