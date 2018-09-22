@@ -1,5 +1,5 @@
 # Sausage Roll
-_My midterm project for the "Decentralized Applications" course by Siraj Raval._
+_A screenshot of the dapp.
 
 ![screenshot](https://github.com/takJohn/sausage-roll/blob/master/sausage-roll.png)
 
